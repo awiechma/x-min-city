@@ -1,0 +1,128 @@
+.sidebars {
+  position: absolute;
+  left: 1%;
+  top: 1%;
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 1000;
+}
+
+.sidebar {
+  background: #f8fff9;
+  border: 2px solid #317b22;
+  border-radius: 12px;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+}
+
+.sidebar h5 {
+  margin-top: 0;
+  color: #2a4d14;
+}
+.sidebar-group {
+  margin-bottom: 1rem;
+}
+
+.sidebar select,
+.sidebar input,
+.sidebar button {
+  width: 100%;
+  margin-top: 0.3rem;
+  box-sizing: border-box;
+  border: 1px solid #67e0a3;
+  border-radius: 20px;
+  background: #fff;
+  color: #2a4d14;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar button:hover {
+  background: #67e0a3;
+}
+.sidebar button:active {
+  background: #317b22;
+}
+
+.sidebar .mode-group {
+  display: flex;
+  gap: 8px;
+}
+.sidebar .mode-btn {
+  flex: 1;
+  padding: 0.45rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #67e0a3;
+  background: #ffffff;
+  color: #2a4d14;
+  font-weight: 600;
+  transition:
+    background 0.15s,
+    transform 0.06s,
+    box-shadow 0.15s;
+}
+.sidebar .mode-btn:hover {
+  background: #67e0a3;
+}
+.sidebar .mode-btn:active {
+  transform: translateY(1px);
+}
+.sidebar .mode-btn.active {
+  background: #317b22;
+  border-color: #317b22;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(103, 224, 163, 0.25);
+}
+.sidebar .time-slider {
+  width: 100%;
+  accent-color: #317b22;
+}
+
+.map-wrap {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+}
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.poi-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.category-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+}
+
+.category-btn:hover {
+  background: #67e0a3;
+}
+.category-btn:active {
+  transform: translateY(1px);
+}
+.category-btn.is-active {
+  background: #317b22;
+  border-color: #317b22;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(103, 224, 163, 0.25);
+}

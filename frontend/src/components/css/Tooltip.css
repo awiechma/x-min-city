@@ -1,0 +1,42 @@
+.map-tip {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9000;
+  background: #f8fff9;
+  border: 2px solid #317b22;
+  color: #2a4d14;
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.map-tip::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #317b22;
+}
+
+.map-tip-text {
+  font-weight: 600;
+}
+.map-tip-close {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #2a4d14;
+}
+.map-tip-close:hover {
+  color: #317b22;
+}

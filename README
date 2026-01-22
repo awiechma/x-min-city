@@ -1,0 +1,8 @@
+pip install -r requirements.txt
+venv/scripts/activate
+npm run dev
+uvicorn main:app --reload
+
+
+JAVA
+Python 3.11

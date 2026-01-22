@@ -1,0 +1,30 @@
+.poi-education {
+  background: #2b6cb0;
+}
+
+.poi-supermarket {
+  background: #ed8936;
+}
+
+.poi-healthcare {
+  background: #e53e3e;
+}
+
+.poi-park {
+  background: #00ff80;
+}
+
+.poi-public_transport {
+  background: #aa85fa;
+}
+
+.poi-restaurant {
+  background: #b7791f;
+}
+
+.poi-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid black;
+}

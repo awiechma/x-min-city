@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+r5py
+httpx
+pandas
+pyproj
+shapely
+asyncio
+router
