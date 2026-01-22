@@ -390,7 +390,7 @@ export default function CityScope() {
             It is always rendered, but only open when rectanglePlaced is false. */}
         <Tooltip
           text="Wählen Sie einen Analysebereich aus"
-          open={!rectanglePlaced}
+          open={!rectanglePlaced && !showScenarioTip}
         />
 
         <CityScopeMap
