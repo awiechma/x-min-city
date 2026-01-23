@@ -4,6 +4,7 @@ export default function Sidebar({
   onStart,
   origin,
   context,
+  bbox,
   analysisLevel = "grid",
   onAnalysisLevelChange,
 }) {
@@ -79,7 +80,10 @@ export default function Sidebar({
 
       <button
         className="btn"
-        disabled={!origin && context !== "cityscope"}
+        disabled={
+          (!origin && context !== "cityscope") ||
+          (context === "cityscope" && !bbox)
+        }
         onClick={() => onStart(mode, minutes)}
       >
         {context === "cityscope"

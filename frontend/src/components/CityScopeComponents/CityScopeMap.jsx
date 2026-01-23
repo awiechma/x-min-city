@@ -13,6 +13,7 @@ export default function CityScopeMap({
   onMapClick,
   rectanglePlaced,
   userPois,
+  scenarioMode,
   analysisLevel,
   districtStats,
   onRectanglePlaced,
@@ -300,6 +301,7 @@ export default function CityScopeMap({
       if (!filtered?.features?.length) return;
 
       const geoJsonLayer = L.geoJSON(filtered, {
+        interactive: !scenarioMode,
         style: districtStyle,
         onEachFeature: (feature, layer) => {
           const html = buildDistrictTooltipHtml(feature.properties || {});
@@ -316,6 +318,7 @@ export default function CityScopeMap({
     if (!results?.features?.length) return;
 
     const geoJsonLayer = L.geoJSON(results, {
+      interactive: !scenarioMode,
       style: (feature) => {
         const ttMax = getMaxTravelTimeForSelected(feature.properties);
 
@@ -361,6 +364,7 @@ export default function CityScopeMap({
     analysisLevel,
     districtGeo,
     districtStats,
+    scenarioMode,
   ]);
 
   // imaginäre POIs anzeigen

@@ -9,8 +9,6 @@ import { CATEGORIES, getLabel, isValidCategory } from "./tagConfig";
 import "./css/CityScope.css";
 import "./css/POI.css";
 
-const DEFAULT_BBOX = "7.05,51.14,7.32,51.25"; // Remscheid (west,south,east,north)
-
 export default function CityScope() {
   // UI / State
   const [selectedCategories, setSelectedCategories] = useState(CATEGORIES);
@@ -58,7 +56,7 @@ export default function CityScope() {
 
       setCurrentMinutes(minutes);
 
-      const bbox = currentBboxRef.current ?? DEFAULT_BBOX;
+      const bbox = currentBboxRef.current || null;
 
       setIsLoading(true);
       setError(null);
@@ -299,6 +297,7 @@ export default function CityScope() {
           onStart={handleStart}
           origin={false}
           context="cityscope"
+          bbox={currentBboxRef.current}
           analysisLevel={analysisLevel}
           onAnalysisLevelChange={setAnalysisLevel}
         />
@@ -402,11 +401,12 @@ export default function CityScope() {
           onRectanglePlaced={setRectanglePlaced}
           analysisLevel={analysisLevel}
           districtStats={districtStats}
+          scenarioMode={scenarioMode}
           onMapClick={handleMapClick}
           onBboxChange={handleBboxChange}
         />
 
-        {gridStats && (
+        {gridStats && !scenarioMode && (
           <div className="cityscope-stats-container">
             <div className="cityscope-stat-box">
               <h5>Coverage Score</h5>
