@@ -90,6 +90,14 @@ async def api_cityscope(req: CityScopeRequest, request: Request):
         df_user = pd.DataFrame(user_rows)
         pois_df = pd.concat([pois_df, df_user], ignore_index=True)
 
+    # 5b.1) optionale "deleted POIs" (Wegfall-Szenario) rausfiltern
+    removed = set(req.removed_poi_ids)
+    if removed:
+        pois_df = pois_df[~pois_df["id"].isin(removed)]
+        
+    if pois_df.empty:
+        return {"type": "FeatureCollection", "features": []}
+
     # 5c) ROI (+ dynamischer Puffer) in Metern (EPSG:3035)
     minutes = int(req.currentMinutes)
 

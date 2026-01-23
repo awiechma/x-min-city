@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./css/Sidebar.css";
 
 export default function Sidebar({
   onStart,
