@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "../css/CityScopeLeaflet.css";
+import { getLabel } from "../tagConfig";
 
 export default function CityScopeMap({
   results,
@@ -79,7 +80,7 @@ export default function CityScopeMap({
       .filter((v) => v != null && Number.isFinite(v));
 
     if (!values.length) return null;
-    return Math.max(...values);
+    return Math.round(Math.max(...values));
   };
 
   const districtStyle = (feature) => {
@@ -130,9 +131,10 @@ export default function CityScopeMap({
     (selectedCategories || []).forEach((cat) => {
       const cKey = cat.toLowerCase();
       const t = stats.means[cKey];
+      const niceLabel = getLabel(cKey) ?? cat;
       if (t == null || !Number.isFinite(t))
-        lines.push(`<b>${cat}:</b> nicht erreichbar`);
-      else lines.push(`<b>${cat}:</b> ${t.toFixed(1)} min`);
+        lines.push(`<b>${niceLabel}:</b> nicht erreichbar`);
+      else lines.push(`<b>${niceLabel}:</b> ${Math.round(t)} min`);
     });
 
     return lines.join("<br/>");
@@ -374,9 +376,11 @@ export default function CityScopeMap({
         Object.entries(props)
           .filter(([k]) => k.startsWith("tt_"))
           .forEach(([k, v]) => {
-            const label = k.replace(/^tt_/, "");
-            if (v == null) lines.push(`<b>${label}:</b> nicht erreichbar`);
-            else lines.push(`<b>${label}:</b> ${Number(v).toFixed(1)} min`);
+            const cat = k.replace(/^tt_/, "");
+            const niceLabel = getLabel(cat) ?? cat;
+
+            if (v == null) lines.push(`<b>${niceLabel}:</b> nicht erreichbar`);
+            else lines.push(`<b>${niceLabel}:</b> ${Math.round(v)} min`);
           });
 
         if (lines.length > 0) layer.bindPopup(lines.join("<br/>"));

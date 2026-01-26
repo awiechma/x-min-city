@@ -1,0 +1,257 @@
+.lp {
+  --bg: #f6fbf7;
+  --card: #ffffff;
+  --text: #0f1a12;
+  --muted: #4a5a4f;
+  --border: #d7e6da;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  --green: #317b22;
+  --green-dark: #255d18;
+  --green-soft: #e8f4ea;
+  --radius: 18px;
+
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.lp-container {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.lp-main {
+  padding: 2.2rem 0 3rem;
+}
+
+.lp-section {
+  padding: 2.4rem 0;
+}
+
+.lp-hero {
+  padding: 4.5rem 0 3.5rem;
+  background: linear-gradient(180deg, #f3fff5 0%, var(--bg) 70%);
+  border-bottom: 1px solid var(--border);
+}
+.lp-hero-inner {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.lp-title {
+  margin: 0 0 0.6rem;
+  font-size: clamp(2rem, 2.8vw, 2.7rem);
+  line-height: 1.1;
+}
+
+.lp-subtitle {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.lp-cta,
+.lp-inline-cta {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.lp-btn {
+  padding: 0.85rem 1.05rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 650;
+  border: 1px solid transparent;
+}
+
+.lp-btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.lp-btn-primary:hover {
+  background: var(--green-dark);
+}
+
+.lp-btn-ghost {
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--green-dark);
+  border-color: var(--border);
+}
+
+.lp-btn-lg {
+  padding: 0.95rem 1.25rem;
+}
+
+.lp-hero-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.lp-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  background: #fbfffc;
+}
+
+.lp-card-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #2a4d14;
+  line-height: 1;
+}
+
+.lp-window-dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.lp-window-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #d7dfda;
+}
+
+.lp-map-screenshot {
+  background: #eef4ef;
+}
+
+.lp-map-screenshot img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.lp-h2 {
+  margin-bottom: 0.6rem;
+  font-size: 1.6rem;
+}
+
+.lp-lead {
+  max-width: 75ch;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 1.4rem;
+}
+
+.lp-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.lp-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.05rem;
+}
+
+.lp-card h3 {
+  margin-bottom: 0.6rem;
+  color: #2a4d14;
+}
+
+.lp-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.lp-split {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+}
+
+.lp-feature {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #ffffff;
+  margin-top: 0.75rem;
+}
+
+.lp-feature-icon {
+  display: grid;
+  place-items: center;
+  background: var(--green-soft);
+  border-radius: 12px;
+  font-weight: 900;
+  color: var(--green-dark);
+}
+
+.lp-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+}
+
+.lp-method {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.9rem;
+}
+
+.lp-method-k {
+  font-weight: 800;
+  color: #2a4d14;
+}
+
+.lp-footer {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 0;
+  background: #fbfffc;
+}
+
+.lp-footer-inner {
+  display: flex;
+  justify-content: space-between;
+}
+
+.lp-footer-title {
+  font-weight: 800;
+  color: #2a4d14;
+}
+
+.lp-footer-sub {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 920px) {
+  .lp-hero-inner,
+  .lp-split,
+  .lp-cards,
+  .lp-method-grid {
+    grid-template-columns: 1fr;
+  }
+}

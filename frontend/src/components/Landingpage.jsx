@@ -1,0 +1,259 @@
+import "./css/LandingPage.css";
+
+export default function LandingPage() {
+  return (
+    <div className="lp">
+      <header className="lp-hero">
+        <div className="lp-hero-inner">
+          <div className="lp-hero-text">
+            <h1 className="lp-title">
+              Die x-Minuten-Stadt am Beispiel Remscheid
+            </h1>
+            <p className="lp-subtitle">
+              Webbasierte, interaktive Analyse der{" "}
+              <b>bevölkerungsbezogenen Erreichbarkeit</b> zentraler
+              Alltagsfunktionen – für Fuß- und Radverkehr, mit 100×100 m Raster
+              und Stadtteil-Auswertung.
+            </p>
+
+            <div className="lp-cta">
+              <a className="lp-btn lp-btn-primary" href="/cityscope">
+                Zur Analyse starten
+              </a>
+              <a className="lp-btn lp-btn-ghost" href="#methodik">
+                Methodik & Daten
+              </a>
+            </div>
+          </div>
+
+          <div className="lp-hero-card lp-hero-preview" aria-hidden="true">
+            <div className="lp-card-top">
+              <div className="lp-window-dots">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="lp-card-title">Vorschau</div>
+            </div>
+            <div className="lp-map-screenshot">
+              <img
+                src="/images/cityscope-preview.png"
+                alt="Vorschau der x-Minuten-Stadt Analyse für Remscheid"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="lp-hero-wave" aria-hidden="true" />
+      </header>
+
+      <main className="lp-main">
+        <section
+          className="lp-section lp-section-cards"
+          aria-label="Kurz erklärt"
+        >
+          <div className="lp-container">
+            <h2 className="lp-h2">Kurz erklärt</h2>
+            <p className="lp-lead">
+              Die Anwendung visualisiert Erreichbarkeit als Reisezeit und fasst
+              sie zu verständlichen Kennzahlen zusammen – auf Raster- und
+              Stadtteil-Ebene.
+            </p>
+
+            <div className="lp-cards">
+              <div className="lp-card">
+                <h3>Was macht die Anwendung?</h3>
+                <ul>
+                  <li>
+                    Kombination aus individueller Erreichbarkeitsanalyse und
+                    stadtweiter Bewertung
+                  </li>
+                  <li>
+                    Zwei integrierte Ansichten: ReachMap für lokale Reichweiten
+                    und CityScope für das Gesamtstadtbild
+                  </li>
+                  <li>
+                    Direkter Wechsel zwischen Standortperspektive und
+                    aggregierter Stadtanalyse
+                  </li>
+                </ul>
+              </div>
+
+              <div className="lp-card">
+                <h3>Wie wird bewertet?</h3>
+                <ul>
+                  <li>
+                    Coverage-Score: Anteil der Bevölkerung, der innerhalb der
+                    Zeitschwelle alle Kategorien erreicht.
+                  </li>
+                  <li>Median-Reisezeit der Bevölkerung zu allen Kategorien</li>
+                  <li>Stadtweite und stadtteilweise Aggregation</li>
+                </ul>
+              </div>
+
+              <div className="lp-card">
+                <h3>Szenarien & Simulation</h3>
+                <ul>
+                  <li>
+                    Interaktives Hinzufügen neuer Einrichtungen (z. B.
+                    Supermärkte, Schulen)
+                  </li>
+                  <li>
+                    Simulation von Wegfallszenarien durch gezieltes Entfernen
+                    bestehender POIs
+                  </li>
+                  <li>
+                    Unmittelbare Neuberechnung von Erreichbarkeit,
+                    Coverage-Score und Reisezeiten
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="lp-inline-cta">
+              <a className="lp-btn lp-btn-primary" href="/cityscope">
+                Analyse öffnen
+              </a>
+              <a className="lp-btn lp-btn-ghost" href="#szenario">
+                Szenario-Modus ansehen
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="lp-section"
+          id="szenario"
+          aria-label="Szenario Modus"
+        >
+          <div className="lp-container lp-split">
+            <div>
+              <h2 className="lp-h2">Szenarien simulieren</h2>
+              <p className="lp-lead">
+                Platziere neue Einrichtungen oder entferne bestehende POIs und
+                sieh unmittelbar, wie sich Coverage-Score und Reisezeiten
+                verändern.
+              </p>
+
+              <div className="lp-feature-list">
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">+</div>
+                  <div>
+                    <div className="lp-feature-title">POIs hinzufügen</div>
+                    <div className="lp-feature-text">
+                      Kategorie wählen, auf die Karte klicken, direkt
+                      vergleichen.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">−</div>
+                  <div>
+                    <div className="lp-feature-title">POIs entfernen</div>
+                    <div className="lp-feature-text">
+                      Wegfall-Szenarien testen (z. B. Schließungen oder
+                      Verlagerungen).
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">↻</div>
+                  <div>
+                    <div className="lp-feature-title">
+                      Sofortige Neuberechnung
+                    </div>
+                    <div className="lp-feature-text">
+                      Kennzahlen aktualisieren sich nach dem Start der Analyse.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="lp-section"
+          id="methodik"
+          aria-label="Methodik und Daten"
+        >
+          <div className="lp-container">
+            <h2 className="lp-h2">Methodik & Daten</h2>
+            <p className="lp-lead">
+              Die Analyse basiert auf Routing im OpenStreetMap-Netzwerk und
+              aggregiert Reisezeiten bevölkerungsgewichtet auf Raster- und
+              Stadtteil-Ebene.
+            </p>
+
+            <div className="lp-method-grid">
+              <div className="lp-method">
+                <div className="lp-method-k">Routing</div>
+                <div className="lp-method-v">
+                  R5 / r5py, OpenStreetMap-Wegenetz
+                </div>
+              </div>
+              <div className="lp-method">
+                <div className="lp-method-k">Bevölkerung</div>
+                <div className="lp-method-v">Zensus 2022, 100×100 m Raster</div>
+                <div className="lp-method-v">Stadtteile Remscheid</div>
+              </div>
+              <div className="lp-method">
+                <div className="lp-method-k">POIs</div>
+                <div className="lp-method-v">OpenStreetMap</div>
+              </div>
+              <div className="lp-method">
+                <div className="lp-method-k">Kennzahlen</div>
+                <div className="lp-method-v">
+                  Coverage-Score & Median-Reisezeit
+                </div>
+              </div>
+              <div className="lp-method">
+                <div className="lp-method-k">Aggregation</div>
+                <div className="lp-method-v">
+                  bevölkerungsgewichtet (Raster → Stadtteile)
+                </div>
+              </div>
+              <div className="lp-method">
+                <div className="lp-method-k">Transparenz</div>
+                <div className="lp-method-v">
+                  Parameter (Schwelle, Kategorien, Modus) nachvollziehbar
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="lp-section lp-section-footer-cta"
+          aria-label="Call to action"
+        >
+          <div className="lp-container lp-footer-cta">
+            <div>
+              <h2 className="lp-h2">Direkt zur Stadtanalyse</h2>
+              <p className="lp-lead">
+                Setze einen Analysebereich, wähle Kategorien und starte die
+                Berechnung.
+              </p>
+            </div>
+            <a className="lp-btn lp-btn-primary lp-btn-lg" href="/cityscope">
+              Zur Analyse starten
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer className="lp-footer">
+        <div className="lp-container lp-footer-inner">
+          <div className="lp-footer-left">
+            <div className="lp-footer-title">x-Minuten-Stadt Remscheid</div>
+            <div className="lp-footer-sub">
+              Bachelorarbeit · Universität Münster · Institut für Geoinformatik
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
