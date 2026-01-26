@@ -29,8 +29,15 @@ export default function CityScope() {
 
   // Scenario mode
   const [scenarioMode, setScenarioMode] = useState(false);
+  const [scenarioAction, setScenarioAction] = useState("add");
+  const [bbox, setBbox] = useState(null); // NEW
   const [scenarioCategory, setScenarioCategory] = useState("supermarket");
-  const [userPois, setUserPois] = useState([]);
+  const [addedUserPois, setAddedUserPois] = useState([]);
+
+  // removal scenario state
+  const [removedPoiIds, setRemovedPoiIds] = useState(() => new Set());
+  const [allPois, setAllPois] = useState([]);
+  const poiRemovalMode = scenarioMode && scenarioAction === "remove";
 
   // Current "minutes" value that should be displayed in the UI
   const [currentMinutes, setCurrentMinutes] = useState(15);
@@ -38,7 +45,8 @@ export default function CityScope() {
   // Tooltip: show hint when scenario mode starts
   const [showScenarioTip, setShowScenarioTip] = useState(false);
   useEffect(() => {
-    if (scenarioMode) setShowScenarioTip(true);
+    if (!scenarioMode) return;
+    setShowScenarioTip(true);
   }, [scenarioMode]);
 
   // Normalize categories once
@@ -70,7 +78,8 @@ export default function CityScope() {
             categories: normalizedCategories,
             bbox,
             currentMinutes: minutes,
-            user_pois: userPois.map((p) => ({
+            removed_poi_ids: Array.from(removedPoiIds).map(Number),
+            user_pois: addedUserPois.map((p) => ({
               lat: p.lat,
               lon: p.lon,
               category: p.category,
@@ -115,17 +124,8 @@ export default function CityScope() {
         setIsLoading(false);
       }
     },
-    [analysisLevel, normalizedCategories, userPois],
+    [analysisLevel, normalizedCategories, addedUserPois, removedPoiIds],
   );
-
-  /**
-   * Computes per-district mean travel time for each selected category.
-   *
-   * The result is weighted by population:
-   * mean_tt = sum(pop * tt) / sum(pop) (only for cells where tt exists)
-   *
-   * Note: This is NOT the same as "district average travel time over all residents"
-   **/
 
   function computeDistrictCategoryMeans(featureCollection, catsLowercase) {
     if (!featureCollection || !Array.isArray(featureCollection.features))
@@ -190,12 +190,6 @@ export default function CityScope() {
     return result;
   }
 
-  /**
-   * Computes two grid-level statistics:
-   * 1) coverage: share of population that can reach ALL selected categories within thresholdMinutes
-   * 2) medianTime: population-weighted median of max(tt_<cat>) across categories per cell
-   *
-   */
   function computeCityScopeStats(
     featureCollection,
     catsLowercase,
@@ -261,12 +255,53 @@ export default function CityScope() {
     return { coverage, medianTime, totalPop, coveredPop };
   }
 
+  /* POI removal (Wegfall-Szenario) */
+  const toggleRemovedPoi = useCallback((poiId) => {
+    setRemovedPoiIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(poiId)) next.delete(poiId);
+      else next.add(poiId);
+      return next;
+    });
+  }, []);
+
+  const clearRemovedPois = useCallback(() => setRemovedPoiIds(new Set()), []);
+
+  useEffect(() => {
+    if (!bbox) {
+      console.log("RESET");
+      setAllPois([]);
+      return;
+    }
+
+    fetch("/api/pois", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bbox, // [south, west, north, east]
+        categories: normalizedCategories,
+      }),
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error(`POIs ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        setAllPois(data.pois || []);
+      })
+      .catch((err) => {
+        console.error(err);
+        setAllPois([]);
+      });
+  }, [bbox, normalizedCategories]);
+
   const handleMapClick = useCallback(
     (lat, lon) => {
       if (!scenarioMode) return;
+      if (scenarioAction !== "add") return;
       if (!isValidCategory(scenarioCategory)) return;
 
-      setUserPois((prev) => [
+      setAddedUserPois((prev) => [
         ...prev,
         {
           id: `user_${prev.length}`,
@@ -277,37 +312,60 @@ export default function CityScope() {
         },
       ]);
     },
-    [scenarioMode, scenarioCategory],
+    [scenarioMode, scenarioAction, scenarioCategory],
   );
 
-  const handleBboxChange = useCallback((bboxString) => {
-    currentBboxRef.current = bboxString;
-  }, []);
+  const handleBboxChange = useCallback(
+    (bboxString) => {
+      currentBboxRef.current = bboxString;
+
+      const arr = bboxString.split(",").map(Number);
+      if (arr.length !== 4 || arr.some((v) => !Number.isFinite(v))) {
+        setBbox(null);
+        return;
+      }
+
+      // Map liefert: west,south,east,north
+      const [west, south, east, north] = arr;
+
+      // Backend erwartet: south,west,north,east
+      const backendBbox = [south, west, north, east];
+
+      setBbox(backendBbox);
+
+      if (poiRemovalMode) clearRemovedPois();
+    },
+    [poiRemovalMode, clearRemovedPois],
+  );
 
   return (
     <div className="cityscope-wrap">
       <Tooltip
         open={showScenarioTip}
-        text="Wählen Sie eine Kategorie aus und klicken Sie dann auf die Karte, um einen POI zu setzen."
+        text={
+          poiRemovalMode
+            ? "Klicken Sie auf POIs, um sie für das Wegfall-Szenario zu entfernen."
+            : "Wählen Sie eine Kategorie aus und klicken Sie dann auf die Karte, um einen POI zu setzen."
+        }
         onClose={() => setShowScenarioTip(false)}
       />
+      {!scenarioMode && (
+        <div className="sidebars">
+          <Sidebar
+            onStart={handleStart}
+            origin={false}
+            context="cityscope"
+            bbox={currentBboxRef.current}
+            analysisLevel={analysisLevel}
+            onAnalysisLevelChange={setAnalysisLevel}
+          />
 
-      <div className="sidebars">
-        <Sidebar
-          onStart={handleStart}
-          origin={false}
-          context="cityscope"
-          bbox={currentBboxRef.current}
-          analysisLevel={analysisLevel}
-          onAnalysisLevelChange={setAnalysisLevel}
-        />
-
-        <CategorySidebar
-          value={selectedCategories}
-          onChange={setSelectedCategories}
-        />
-      </div>
-
+          <CategorySidebar
+            value={selectedCategories}
+            onChange={setSelectedCategories}
+          />
+        </div>
+      )}
       <div className="cityscope-map-wrap">
         {error && <div className="cityscope-error">{error}</div>}
 
@@ -317,18 +375,21 @@ export default function CityScope() {
             <button
               type="button"
               className="cityscope-scenario-toggle-btn"
-              onClick={() => setScenarioMode(true)}
+              onClick={() => {
+                setScenarioMode(true);
+                setScenarioAction("add");
+              }}
             >
-              Add new POIs
+              Szenario Modus starten
             </button>
           </div>
         )}
 
-        {/* Scenario panel) */}
+        {/* Scenario panel */}
         {scenarioMode && (
           <div className="cityscope-scenario-panel leaflet-right">
             <div className="scenario-panel-header">
-              <h5>Szenario-POIs</h5>
+              <h5>Szenario</h5>
               <button
                 type="button"
                 className="scenario-exit-btn"
@@ -340,68 +401,121 @@ export default function CityScope() {
                 ✕
               </button>
             </div>
-            Kategorie:
-            <br />
-            <select
-              value={scenarioCategory}
-              onChange={(e) => setScenarioCategory(e.target.value)}
+
+            {/* NEW: choose add vs remove */}
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                marginBottom: "0.75rem",
+              }}
             >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {getLabel(c)}
-                </option>
-              ))}
-            </select>
-            {userPois.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setScenarioAction("add")}
+                className={`ui-btn ${scenarioAction === "add" ? "active" : ""}`}
+              >
+                POI hinzufügen
+              </button>
+              <button
+                type="button"
+                onClick={() => setScenarioAction("remove")}
+                className={`ui-btn ${scenarioAction === "remove" ? "active" : ""}`}
+                title={
+                  !rectanglePlaced
+                    ? "Bitte zuerst einen Analysebereich auswählen"
+                    : ""
+                }
+              >
+                POI entfernen
+              </button>
+            </div>
+
+            {scenarioAction === "add" && (
               <>
-                <div className="scenario-poi-list">
-                  {userPois.map((p) => (
-                    <div key={p.id} className="scenario-poi-item">
-                      <span>{getLabel(p.category)}</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setUserPois((prev) =>
-                            prev.filter((q) => q.id !== p.id),
-                          )
-                        }
-                        aria-label="POI löschen"
-                      >
-                        🗑
-                      </button>
-                    </div>
+                Kategorie:
+                <br />
+                <select
+                  value={scenarioCategory}
+                  onChange={(e) => setScenarioCategory(e.target.value)}
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {getLabel(c)}
+                    </option>
                   ))}
+                </select>
+                {addedUserPois.length > 0 && (
+                  <>
+                    <div className="scenario-poi-list">
+                      {addedUserPois.map((p) => (
+                        <div key={p.id} className="scenario-poi-item">
+                          <span>{getLabel(p.category)}</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setAddedUserPois((prev) =>
+                                prev.filter((q) => q.id !== p.id),
+                              )
+                            }
+                            aria-label="POI löschen"
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="scenario-clear-btn"
+                      onClick={() => setAddedUserPois([])}
+                    >
+                      Alle Szenario-POIs löschen
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+
+            {scenarioAction === "remove" && (
+              <>
+                <div style={{ marginBottom: "0.5rem" }}>
+                  Klicke POIs auf der Karte an, um sie zu entfernen.
                 </div>
 
                 <button
                   type="button"
                   className="scenario-clear-btn"
-                  onClick={() => setUserPois([])}
+                  onClick={clearRemovedPois}
+                  disabled={removedPoiIds.size === 0}
                 >
-                  Alle Szenario-POIs löschen
+                  Entfernte POIs zurücksetzen
                 </button>
               </>
             )}
           </div>
         )}
 
-        {/* This tooltip is meant to guide the user to draw/select the analysis area.
-            It is always rendered, but only open when rectanglePlaced is false. */}
         <Tooltip
           text="Wählen Sie einen Analysebereich aus"
-          open={!rectanglePlaced && !showScenarioTip}
+          open={!rectanglePlaced && !scenarioMode}
         />
 
         <CityScopeMap
           results={cityScopeLayer}
           thresholdMinutes={currentMinutes}
           selectedCategories={selectedCategories}
-          userPois={userPois}
           rectanglePlaced={rectanglePlaced}
           onRectanglePlaced={setRectanglePlaced}
           analysisLevel={analysisLevel}
           districtStats={districtStats}
           scenarioMode={scenarioMode}
+          allPois={allPois}
+          poiRemovalMode={poiRemovalMode}
+          removedPoiIds={removedPoiIds}
+          onToggleRemovePoi={toggleRemovedPoi}
+          userPois={addedUserPois}
           onMapClick={handleMapClick}
           onBboxChange={handleBboxChange}
         />

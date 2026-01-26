@@ -3,6 +3,7 @@ import Header from "/src/components/Header";
 import ReachMap from "/src/components/ReachMap";
 import CityScope from "./components/CityScope";
 import Impressum from "/src/components/Impressum";
+import LandingPage from "/src/components/LandingPage";
 import "leaflet/dist/leaflet.css";
 import { Routes, Route } from "react-router";
 
@@ -11,6 +12,7 @@ function App() {
     <>
       <Header />
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/reachmap" element={<ReachMap />} />
         <Route path="/cityscope" element={<CityScope />} />
         <Route path="/impressum" element={<Impressum />} />

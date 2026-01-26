@@ -11,9 +11,9 @@ function Impressum() {
           <p>
             Amon Wiechmann
             <br />
-            Hollmannstraße 19
+            Heisenbergstraße 2
             <br />
-            44229 Dortmund
+            48149 Münster
             <br />
             Deutschland
           </p>

@@ -11,7 +11,6 @@ function Header() {
           <Nav className="me-auto">
             <Nav.Link href="/reachmap">ReachMap</Nav.Link>
             <Nav.Link href="/cityscope">CityScope</Nav.Link>
-            <Nav.Link href="/about">About</Nav.Link>
             <Nav.Link href="/impressum">Impressum</Nav.Link>
           </Nav>
         </Navbar.Collapse>

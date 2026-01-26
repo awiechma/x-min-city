@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "../css/CityScopeLeaflet.css";
+import { getLabel } from "../tagConfig";
 
 export default function CityScopeMap({
   results,
@@ -17,6 +18,10 @@ export default function CityScopeMap({
   analysisLevel,
   districtStats,
   onRectanglePlaced,
+  allPois,
+  poiRemovalMode,
+  removedPoiIds,
+  onToggleRemovePoi,
 }) {
   const mapElRef = useRef(null);
   const mapRef = useRef(null);
@@ -24,6 +29,7 @@ export default function CityScopeMap({
   const layerRef = useRef(null);
   const legendRef = useRef(null);
   const userPoisLayerRef = useRef(null);
+  const allPoisLayerRef = useRef(null);
 
   const drawnGroupRef = useRef(null);
   const roiLayerRef = useRef(null);
@@ -74,7 +80,7 @@ export default function CityScopeMap({
       .filter((v) => v != null && Number.isFinite(v));
 
     if (!values.length) return null;
-    return Math.max(...values);
+    return Math.round(Math.max(...values));
   };
 
   const districtStyle = (feature) => {
@@ -125,9 +131,10 @@ export default function CityScopeMap({
     (selectedCategories || []).forEach((cat) => {
       const cKey = cat.toLowerCase();
       const t = stats.means[cKey];
+      const niceLabel = getLabel(cKey) ?? cat;
       if (t == null || !Number.isFinite(t))
-        lines.push(`<b>${cat}:</b> nicht erreichbar`);
-      else lines.push(`<b>${cat}:</b> ${t.toFixed(1)} min`);
+        lines.push(`<b>${niceLabel}:</b> nicht erreichbar`);
+      else lines.push(`<b>${niceLabel}:</b> ${Math.round(t)} min`);
     });
 
     return lines.join("<br/>");
@@ -195,6 +202,11 @@ export default function CityScopeMap({
       drawnItems.clearLayers();
       drawnItems.addLayer(e.layer);
       roiLayerRef.current = e.layer;
+      if (allPoisLayerRef.current) {
+        allPoisLayerRef.current.remove();
+        allPoisLayerRef.current = null;
+      }
+
       onRectanglePlaced?.(true);
       emitBboxFromBounds(e.layer.getBounds());
     };
@@ -235,6 +247,19 @@ export default function CityScopeMap({
     return () => {
       map.off(L.Draw.Event.CREATED, onCreated);
 
+      if (allPoisLayerRef.current) {
+        allPoisLayerRef.current.remove();
+        allPoisLayerRef.current = null;
+      }
+      if (userPoisLayerRef.current) {
+        userPoisLayerRef.current.remove();
+        userPoisLayerRef.current = null;
+      }
+      if (layerRef.current) {
+        layerRef.current.remove();
+        layerRef.current = null;
+      }
+
       map.remove();
       mapRef.current = null;
       drawnGroupRef.current = null;
@@ -255,7 +280,7 @@ export default function CityScopeMap({
       btn.classList.remove("pulse-rectangle");
     }
   }, [
-    // abhängig von rectanglePlaced
+    // abhängig von rectanglePlaced und scenarioMode
     rectanglePlaced,
   ]);
 
@@ -265,10 +290,15 @@ export default function CityScopeMap({
     if (!map || !onMapClick) return;
 
     const handler = (e) => onMapClick(e.latlng.lat, e.latlng.lng);
-    map.on("click", handler);
 
-    return () => map.off("click", handler);
-  }, [onMapClick]);
+    if (!poiRemovalMode) {
+      map.on("click", handler);
+    }
+
+    return () => {
+      map.off("click", handler);
+    };
+  }, [onMapClick, poiRemovalMode]);
 
   // GeoJSON (Grid oder District) aktualisieren
   useEffect(() => {
@@ -346,9 +376,11 @@ export default function CityScopeMap({
         Object.entries(props)
           .filter(([k]) => k.startsWith("tt_"))
           .forEach(([k, v]) => {
-            const label = k.replace(/^tt_/, "");
-            if (v == null) lines.push(`<b>${label}:</b> nicht erreichbar`);
-            else lines.push(`<b>${label}:</b> ${Number(v).toFixed(1)} min`);
+            const cat = k.replace(/^tt_/, "");
+            const niceLabel = getLabel(cat) ?? cat;
+
+            if (v == null) lines.push(`<b>${niceLabel}:</b> nicht erreichbar`);
+            else lines.push(`<b>${niceLabel}:</b> ${Math.round(v)} min`);
           });
 
         if (lines.length > 0) layer.bindPopup(lines.join("<br/>"));
@@ -395,6 +427,71 @@ export default function CityScopeMap({
     group.addTo(map);
     userPoisLayerRef.current = group;
   }, [userPois]);
+
+  // Alle POIs anzeigen + im Wegfall-Modus per Klick "löschen"
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    // alten Layer entfernen
+    if (allPoisLayerRef.current) {
+      allPoisLayerRef.current.remove();
+      allPoisLayerRef.current = null;
+    }
+    console.log(allPois);
+    // nur anzeigen, wenn Wegfall-Modus aktiv ist (oder wenn du einen extra "showAllPois" boolean willst)
+    if (!poiRemovalMode) return;
+    if (!allPois || allPois.length === 0) return;
+
+    const removedSet =
+      removedPoiIds instanceof Set
+        ? removedPoiIds
+        : new Set(removedPoiIds || []);
+
+    const group = L.layerGroup(
+      allPois
+        // optional: entfernte POIs gar nicht mehr anzeigen
+        .filter((p) => !removedSet.has(String(p.id)))
+        .map((p) => {
+          const id = String(p.id);
+
+          const marker = L.marker([p.lat, p.lon], {
+            icon: L.divIcon({
+              className: `poi-dot poi-${String(p.category || "").toLowerCase()}`,
+              html: "",
+              iconSize: [12, 12],
+            }),
+            interactive: true,
+          });
+
+          marker.on("click", (e) => {
+            L.DomEvent.stopPropagation(e);
+
+            if (typeof onToggleRemovePoi === "function") {
+              onToggleRemovePoi(id);
+            }
+          });
+
+          marker.bindTooltip(p.name || p.category || "POI", {
+            direction: "top",
+            offset: [0, -6],
+            opacity: 0.9,
+          });
+
+          return marker;
+        }),
+    );
+
+    group.addTo(map);
+    allPoisLayerRef.current = group;
+
+    return () => {
+      if (allPoisLayerRef.current) {
+        allPoisLayerRef.current.remove();
+        allPoisLayerRef.current = null;
+      }
+    };
+  }, [poiRemovalMode, allPois, removedPoiIds, onToggleRemovePoi]);
 
   return (
     <div

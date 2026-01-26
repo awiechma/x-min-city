@@ -18,8 +18,9 @@ class UserPoi(BaseModel):
     name: Optional[str] = None
 
 class CityScopeRequest(BaseModel):
-    mode: str
-    categories: List[str]
     bbox: str
+    categories: list[str]
+    mode: str
     currentMinutes: int
     user_pois: Optional[List[UserPoi]] = None
+    removed_poi_ids: Optional[List[int]] = None
