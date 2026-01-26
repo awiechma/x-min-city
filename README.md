@@ -1,16 +1,3 @@
-cd ./backend
-py -11.3 -m venv .venv
-.venv/scripts/activate
-pip install -r requirements.txt
-uvicorn app:app --reload
-
-cd ./frontend
-npm install
-npm run dev
-
-JAVA
-Python 3.11
-
 # 🏙️ x-Minute-City Remscheid
 
 [![Status](https://img.shields.io/badge/status-active-brightgreen)](#)

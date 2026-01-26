@@ -12,8 +12,8 @@ export default function LandingPage() {
             <p className="lp-subtitle">
               Webbasierte, interaktive Analyse der{" "}
               <b>bevölkerungsbezogenen Erreichbarkeit</b> zentraler
-              Alltagsfunktionen – für Fuß- und Radverkehr, mit 100×100 m Raster
-              und Stadtteil-Auswertung.
+              Alltagsfunktionen. Ausgewertet werden Fuß- und Radverkehr auf 100m
+              x 100m oder Stadteilebene.
             </p>
 
             <div className="lp-cta">
