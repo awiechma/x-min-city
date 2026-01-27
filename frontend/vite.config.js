@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:8000", // Service-Name aus docker-compose
+        target: "http://localhost:8000",
         changeOrigin: true,
       },
     },
