@@ -21,6 +21,7 @@ export default function ReachMap() {
   const poiLayerRef = useRef(null);
   const isoLayerRef = useRef(null);
   const originMarkerRef = useRef(null);
+  const [visiblePois, setVisiblePois] = useState([]);
 
   const isoPolygonRef = useRef(null);
 
@@ -219,9 +220,8 @@ export default function ReachMap() {
         if (iso) displayGeoJSON(iso);
 
         // Fetch + filter POIs after the isochrone is known
-        const pois = await fetchPois(iso, categories);
-        if (pois?.length) displayPois(pois);
-        else if (poiLayerRef.current) poiLayerRef.current.clearLayers();
+        const pois = await fetchPois(iso, CATEGORIES);
+        setVisiblePois(pois || []);
       } catch (e) {
         console.error(e);
         if (poiLayerRef.current) poiLayerRef.current.clearLayers();
@@ -235,6 +235,16 @@ export default function ReachMap() {
     },
     [origin, categories, getIsochrones, fetchPois, displayGeoJSON, displayPois],
   );
+
+  useEffect(() => {
+    if (!poiLayerRef.current) return;
+
+    const active = new Set(categories);
+
+    const filtered = visiblePois.filter((p) => active.has(p.category));
+
+    displayPois(filtered);
+  }, [categories, visiblePois, displayPois]);
 
   return (
     <div className="map-wrap">

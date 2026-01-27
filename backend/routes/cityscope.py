@@ -25,10 +25,9 @@ async def api_cityscope(req: CityScopeRequest, request: Request):
     df_grid = st.df_grid
     poi_cache = st.poi_cache
 
-    # 2) Kategorien validieren/normalisieren
-    cats = [c.lower() for c in req.categories if c.lower() in CATS]
-    if not cats:
-        return {"type": "FeatureCollection", "features": []}
+
+    # 2) Temp: alle Kategorien 
+    cats = list(CATS)
 
     # 3) BBox parsen (WGS84: "minLon,minLat,maxLon,maxLat")
     try:
@@ -144,14 +143,15 @@ async def api_cityscope(req: CityScopeRequest, request: Request):
     )
 
     # 7) TravelTimeMatrix
-    t_modes = [TransportMode.WALK] if req.mode.lower() == "walk" else [TransportMode.BICYCLE]
+    speed_kwargs = {"speed_walking": 4} if req.mode.lower() == "walk" else {"speed_walking": 17}
 
     travel_time_matrix = TravelTimeMatrix(
         network,
         origins=origins_gdf,
         destinations=pois_gdf,
-        transport_modes=t_modes,
+        transport_modes=[TransportMode.WALK],
         departure=datetime.datetime(2026, 1, 1, 8, 0),
+        **speed_kwargs,
     )
 
     # 8) POI-Kategorie an die Matrix hängen

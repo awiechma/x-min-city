@@ -78,7 +78,9 @@ export default function Sidebar({
           onChange={(e) => {
             const newMinutes = parseInt(e.target.value, 10);
             setMinutes(newMinutes);
-            onMinutesChange(newMinutes);
+            if (context === "cityscope" && onMinutesChange) {
+              onMinutesChange(newMinutes);
+            } 
           }}
         />
       </div>
