@@ -5,6 +5,7 @@ export default function Sidebar({
   onStart,
   origin,
   context,
+  onMinutesChange,
   bbox,
   analysisLevel = "grid",
   onAnalysisLevelChange,
@@ -20,7 +21,6 @@ export default function Sidebar({
   return (
     <div className="sidebar">
       <h5>Einstellungen</h5>
-
       <div className="sidebar-group">
         <label>Transportmodus:</label>
         <div className="mode-group">
@@ -75,7 +75,11 @@ export default function Sidebar({
           min="1"
           max="30"
           value={minutes}
-          onChange={(e) => setMinutes(parseInt(e.target.value, 10))}
+          onChange={(e) => {
+            const newMinutes = parseInt(e.target.value, 10);
+            setMinutes(newMinutes);
+            onMinutesChange(newMinutes);
+          }}
         />
       </div>
 

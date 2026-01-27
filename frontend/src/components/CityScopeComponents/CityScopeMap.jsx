@@ -373,15 +373,17 @@ export default function CityScopeMap({
         lines.push(`<b>Zelle:</b> ${props.id ?? "-"}`);
         if (props.pop != null) lines.push(`<b>Einwohner:</b> ${props.pop}`);
 
-        Object.entries(props)
-          .filter(([k]) => k.startsWith("tt_"))
-          .forEach(([k, v]) => {
-            const cat = k.replace(/^tt_/, "");
-            const niceLabel = getLabel(cat) ?? cat;
+        const selectedCatsLower = (selectedCategories || []).map((c) =>
+          String(c).toLowerCase(),
+        );
 
-            if (v == null) lines.push(`<b>${niceLabel}:</b> nicht erreichbar`);
-            else lines.push(`<b>${niceLabel}:</b> ${Math.round(v)} min`);
-          });
+        selectedCatsLower.forEach((cat) => {
+          const v = props[`tt_${cat}`];
+          const niceLabel = getLabel(cat) ?? cat;
+
+          if (v == null) lines.push(`<b>${niceLabel}:</b> nicht erreichbar`);
+          else lines.push(`<b>${niceLabel}:</b> ${Math.round(v)} min`);
+        });
 
         if (lines.length > 0) layer.bindPopup(lines.join("<br/>"));
       },

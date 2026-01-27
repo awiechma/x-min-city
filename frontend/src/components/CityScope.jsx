@@ -30,7 +30,7 @@ export default function CityScope() {
   // Scenario mode
   const [scenarioMode, setScenarioMode] = useState(false);
   const [scenarioAction, setScenarioAction] = useState("add");
-  const [bbox, setBbox] = useState(null); // NEW
+  const [bbox, setBbox] = useState(null);
   const [scenarioCategory, setScenarioCategory] = useState("supermarket");
   const [addedUserPois, setAddedUserPois] = useState([]);
 
@@ -255,6 +255,26 @@ export default function CityScope() {
     return { coverage, medianTime, totalPop, coveredPop };
   }
 
+  useEffect(() => {
+    if (!cityScopeLayer) return;
+
+    if (analysisLevel === "grid") {
+      setGridStats(
+        computeCityScopeStats(
+          cityScopeLayer,
+          normalizedCategories,
+          currentMinutes,
+        ),
+      );
+      setDistrictStats(null);
+    } else {
+      setDistrictStats(
+        computeDistrictCategoryMeans(cityScopeLayer, normalizedCategories),
+      );
+      setGridStats(null);
+    }
+  }, [cityScopeLayer, analysisLevel, normalizedCategories, currentMinutes]);
+
   /* POI removal (Wegfall-Szenario) */
   const toggleRemovedPoi = useCallback((poiId) => {
     setRemovedPoiIds((prev) => {
@@ -356,6 +376,8 @@ export default function CityScope() {
             origin={false}
             context="cityscope"
             bbox={currentBboxRef.current}
+            minutes={currentMinutes}
+            onMinutesChange={setCurrentMinutes}
             analysisLevel={analysisLevel}
             onAnalysisLevelChange={setAnalysisLevel}
           />
@@ -505,6 +527,7 @@ export default function CityScope() {
         <CityScopeMap
           results={cityScopeLayer}
           thresholdMinutes={currentMinutes}
+          onMinutesChange={setCurrentMinutes}
           selectedCategories={selectedCategories}
           rectanglePlaced={rectanglePlaced}
           onRectanglePlaced={setRectanglePlaced}
