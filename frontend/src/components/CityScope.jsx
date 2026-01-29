@@ -90,7 +90,9 @@ export default function CityScope() {
 
         if (!res.ok) {
           const text = await res.text();
-          throw new Error(`API /api/cityscope ${res.status}: ${text}`);
+          throw new Error(
+            `Untersuchungsgebiet übersteigt Test-Server-Limits. (Bitte kleiner wählen)`,
+          );
         }
 
         const featureCollection = await res.json();

@@ -56,8 +56,7 @@ export default function LandingPage() {
             <h2 className="lp-h2">Kurz erklärt</h2>
             <p className="lp-lead">
               Die Anwendung visualisiert Erreichbarkeit als Reisezeit und fasst
-              sie zu verständlichen Kennzahlen zusammen – auf Raster- und
-              Stadtteil-Ebene.
+              sie zu verständlichen Kennzahlen zusammen.
             </p>
 
             <div className="lp-cards">
@@ -111,11 +110,11 @@ export default function LandingPage() {
             </div>
 
             <div className="lp-inline-cta">
-              <a className="lp-btn lp-btn-primary" href="/cityscope">
-                Analyse öffnen
+              <a className="lp-btn lp-btn-primary" href="/reachmap">
+                Lokale Erreichbarkeit öffnen
               </a>
-              <a className="lp-btn lp-btn-ghost" href="#szenario">
-                Szenario-Modus ansehen
+              <a className="lp-btn lp-btn-primary" href="/cityscope">
+                Stadtweite-Analyse öffnen
               </a>
             </div>
           </div>
@@ -238,7 +237,7 @@ export default function LandingPage() {
               </p>
             </div>
             <a className="lp-btn lp-btn-primary lp-btn-lg" href="/cityscope">
-              Zur Analyse starten
+              Zur Analyse
             </a>
           </div>
         </section>
@@ -251,6 +250,11 @@ export default function LandingPage() {
             <div className="lp-footer-sub">
               Bachelorarbeit · Universität Münster · Institut für Geoinformatik
             </div>
+          </div>
+          <div className="lp-footer-right mt-3">
+            <a className="lp-btn lp-btn-ghost lp-btn-lg" href="/impressum">
+              Impressum
+            </a>
           </div>
         </div>
       </footer>
