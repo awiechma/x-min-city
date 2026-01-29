@@ -24,6 +24,21 @@ export default function LandingPage() {
                 Methodik & Daten
               </a>
             </div>
+            {window.location.hostname === "x-min-city.com" && (
+              <div className="lp-warning-box" role="alert">
+                <div className="lp-warning-title">
+                  Hinweis zur Serverleistung
+                </div>
+                <p className="lp-warning-text">
+                  Die Anwendung wird derzeit auf einem privat betriebenen Server
+                  ausgeführt. Aufgrund der begrenzten Serverressourcen sind
+                  aktuell nur kleinere Analysebereiche sinnvoll nutzbar. Sehr
+                  große Bounding-Boxen (z. B. das gesamte Stadtgebiet
+                  Remscheids) können zu langen Rechenzeiten oder Abbrüchen
+                  führen.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="lp-hero-card lp-hero-preview" aria-hidden="true">
