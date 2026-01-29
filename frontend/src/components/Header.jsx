@@ -5,7 +5,15 @@ function Header() {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="/ ">x-minute-city</Navbar.Brand>
+        <Navbar.Brand href="/" className="d-flex align-items-center gap-2">
+          <img
+            src="/images/logo.png"
+            alt="x-min-city logo"
+            height="28"
+            className="d-inline-block align-top"
+          />
+          <span>x-minute-city</span>
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
