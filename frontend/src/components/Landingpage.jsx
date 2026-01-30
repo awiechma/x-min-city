@@ -188,6 +188,140 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section className="lp-section" id="tutorials" aria-label="Tutorials">
+          <div className="lp-container lp-split">
+            <div>
+              <h2 className="lp-h2">Tutorials</h2>
+              <p className="lp-lead">
+                Kurze Schritt-für-Schritt-Anleitungen für ReachMap (lokal) und
+                CityScope (stadtweit) – inkl. Tipps für sinnvolle Parameter und
+                schnelle Berechnungen.
+              </p>
+
+              <div className="lp-feature-list" style={{ marginTop: 18 }}>
+                <h3 className="lp-h3" style={{ marginBottom: 10 }}>
+                  ReachMap: lokale Erreichbarkeit
+                </h3>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">1</div>
+                  <div>
+                    <div className="lp-feature-title">Standort wählen</div>
+                    <div className="lp-feature-text">
+                      Öffne ReachMap und klicke auf die Karte, um deinen
+                      Startpunkt zu setzen (z. B. Wohnort, Haltestelle,
+                      Quartierszentrum).
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">2</div>
+                  <div>
+                    <div className="lp-feature-title">
+                      Modus & Zeitschwelle einstellen
+                    </div>
+                    <div className="lp-feature-text">
+                      Wähle Fuß oder Fahrrad und setze eine Zeitschwelle (z. B.
+                      10/15 Minuten). Damit definierst du die maximale
+                      Reisezeit.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">3</div>
+                  <div>
+                    <div className="lp-feature-title">Kategorien prüfen</div>
+                    <div className="lp-feature-text">
+                      Aktiviere die relevanten POI-Kategorien (z. B. Versorgung,
+                      Gesundheit, Bildung).
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">4</div>
+                  <div>
+                    <div className="lp-feature-title">Berechnung starten</div>
+                    <div className="lp-feature-text">
+                      Die Karte zeigt erreichbare Ziele innerhalb der Zeit.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lp-feature-list" style={{ marginTop: 26 }}>
+                <h3 className="lp-h3" style={{ marginBottom: 10 }}>
+                  CityScope: stadtweite Analyse
+                </h3>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">1</div>
+                  <div>
+                    <div className="lp-feature-title">
+                      Analysebereich festlegen
+                    </div>
+                    <div className="lp-feature-text">
+                      Öffne CityScope und ziehe, mithilfe des Tools oben links,
+                      eine Bounding-Box auf. Starte mit einem kleineren Bereich
+                      (z. B. ein Stadtteil), um schnelle Ergebnisse zu bekommen.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">2</div>
+                  <div>
+                    <div className="lp-feature-title">Ebene wählen</div>
+                    <div className="lp-feature-text">
+                      Entscheide zwischen 100×100-m-Raster (detailreich) oder
+                      Stadtteil- Aggregation (übersichtlich, schneller zu
+                      lesen).
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">3</div>
+                  <div>
+                    <div className="lp-feature-title">Parameter setzen</div>
+                    <div className="lp-feature-text">
+                      Wähle Modus (Fuß/Rad), Zeitschwelle und Kategorien.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">4</div>
+                  <div>
+                    <div className="lp-feature-title">
+                      Analyse starten & Kennzahlen lesen
+                    </div>
+                    <div className="lp-feature-text">
+                      Starte die Berechnung. Prüfe anschließend Coverage-Score
+                      und Median-Reisezeit.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lp-feature">
+                  <div className="lp-feature-icon">5</div>
+                  <div>
+                    <div className="lp-feature-title">Szenario testen</div>
+                    <div className="lp-feature-text">
+                      Füge mithilfe des Szenario-Modus (unten recthts) POIs
+                      hinzu oder entferne bestehende, um Maßnahmen (z. B. neue
+                      Nahversorgung) oder Wegfälle zu simulieren. Danach neu
+                      berechnen und Werte vergleichen.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section
           className="lp-section"
           id="methodik"
