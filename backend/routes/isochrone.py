@@ -10,10 +10,7 @@ def returnIsochrones(req: IsochroneRequest, request: Request):
     if st.network_status != "ready":
         raise HTTPException(status_code=500, detail="Transport network not yet ready")
 
-    if req.mode.lower() == "walk":
-        speed_kmh = 5  # km/h
-    else:
-        speed_kmh = 20  # km/h
+
 
     return calculate_isochrones(
         network=st.network,
@@ -21,5 +18,4 @@ def returnIsochrones(req: IsochroneRequest, request: Request):
         lon=req.lon,
         mode="walk",
         threshold=req.threshold,
-        speed_kmh=speed_kmh,
     )

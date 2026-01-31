@@ -9,6 +9,9 @@ CSV_PATH_GRID = "./data/census_100m_with_district.csv"
 DISTRICTS_SHP = "data/districts.shp"
 DISTRICT_ID_COL = "id"
 
+WALK_SPEED = 4.7
+CYCLE_SPEED = 15
+
 CELL_SIZE = 100.0
 HALF = CELL_SIZE / 2.0
 
