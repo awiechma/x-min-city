@@ -16,6 +16,6 @@ def returnIsochrones(req: IsochroneRequest, request: Request):
         network=st.network,
         lat=req.lat,
         lon=req.lon,
-        mode="walk",
+        mode=req.mode,
         threshold=req.threshold,
     )

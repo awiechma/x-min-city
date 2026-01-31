@@ -20,7 +20,7 @@ CATS = {
     "restaurant": {"amenity": ["bar", "biergarten", "cafe", "fast_food", "food_court", "pub", "restaurant"]},
     "supermarket": {"shop": ["supermarket", "convenience", "food", "mall"]},
     "healthcare": {"amenity": ["clinic", "dentist", "doctors", "hospital", "pharmacy"]},
-    "park": {"leisure": ["dog_park", "garden", "nature_reserve", "park", "playground"]},
+    "park": {"leisure": ["dog_park", "garden", "nature_reserve", "park", "playground", "cemetery" ]},
     "public_transport": {
         "amenity": ["bus_station", "taxi"],
         "public_transport": ["station", "stop_position", "platform"],
