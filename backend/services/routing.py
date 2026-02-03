@@ -1,20 +1,21 @@
 import datetime
 import shapely
 from r5py import Isochrones, TransportMode, TravelTimeMatrix
+from core.config import WALK_SPEED, CYCLE_SPEED
 
 import shapely
 from r5py import Isochrones, TransportMode
 
-def calculate_isochrones(network, lat: float, lon: float, mode: str, threshold: int, speed_kmh: float):
+def calculate_isochrones(network, lat: float, lon: float, mode: str, threshold: int):
     center = shapely.Point(lon, lat)
     mode_l = mode.lower()
 
     if mode_l == "walk":
         t_modes = [TransportMode.WALK]
-        speed_kwargs = {"speed_walking": speed_kmh}
+        speed_kwargs = {"speed_walking": WALK_SPEED}
     else:
         t_modes = [TransportMode.WALK] # Ebenfalls walk da Cycling nicht konsistente Ergebnisse liefert
-        speed_kwargs = {"speed_walking": speed_kmh}
+        speed_kwargs = {"speed_walking": CYCLE_SPEED}
 
     iso = Isochrones(
         network,
