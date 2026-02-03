@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from core.schemas import CityScopeRequest
-from core.config import CATS, HALF
+from core.config import CATS, HALF, WALK_SPEED, CYCLE_SPEED
 
 import datetime
 import math
@@ -151,9 +151,8 @@ async def api_cityscope(req: CityScopeRequest, request: Request):
     )
 
     # Configure mode and speeds for R5 (walking mode; speed overridden per scenario)
-    speed_kwargs = (
-        {"speed_walking": 4} if req.mode.lower() == "walk" else {"speed_walking": 17}
-    )
+    speed_kwargs = {"speed_walking": WALK_SPEED} if req.mode.lower() == "walk" else {"speed_walking": CYCLE_SPEED}
+
 
     travel_time_matrix = TravelTimeMatrix(
         network,
