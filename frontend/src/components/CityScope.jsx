@@ -10,16 +10,16 @@ import "./css/CityScope.css";
 import "./css/POI.css";
 
 export default function CityScope() {
-  // UI / State
+  // UI state
   const [selectedCategories, setSelectedCategories] = useState(CATEGORIES);
-  const [analysisLevel, setAnalysisLevel] = useState("grid"); // "grid" | "district"
+  const [analysisLevel, setAnalysisLevel] = useState("grid");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // API results
   const [cityScopeLayer, setCityScopeLayer] = useState(null);
 
-  // Derived results (only one is set depending on analysisLevel)
+  // Derived results
   const [gridStats, setGridStats] = useState(null);
   const [districtStats, setDistrictStats] = useState(null);
 
@@ -34,29 +34,30 @@ export default function CityScope() {
   const [scenarioCategory, setScenarioCategory] = useState("supermarket");
   const [addedUserPois, setAddedUserPois] = useState([]);
 
-  // removal scenario state
+  // Removal scenario state
   const [removedPoiIds, setRemovedPoiIds] = useState(() => new Set());
   const [allPois, setAllPois] = useState([]);
   const poiRemovalMode = scenarioMode && scenarioAction === "remove";
 
-  // Current "minutes" value that should be displayed in the UI
+  // Currently selected time threshold (minutes)
   const [currentMinutes, setCurrentMinutes] = useState(15);
 
-  // Tooltip: show hint when scenario mode starts
+  // Show a one-time hint when scenario mode is enabled
   const [showScenarioTip, setShowScenarioTip] = useState(false);
   useEffect(() => {
     if (!scenarioMode) return;
     setShowScenarioTip(true);
   }, [scenarioMode]);
 
-  // Normalize categories once
+  // Normalize categories once for API + computations
   const normalizedCategories = useMemo(
     () => (selectedCategories || []).map((c) => c.toLowerCase()),
     [selectedCategories],
   );
 
   /**
-   * Starts the computation by calling the backend.
+   * Starts the CityScope computation by calling the backend and deriving
+   * the aggregated metrics needed for the current analysis level.
    */
   const handleStart = useCallback(
     async (mode, minutes) => {
@@ -89,9 +90,9 @@ export default function CityScope() {
         });
 
         if (!res.ok) {
-          const text = await res.text();
+          await res.text(); // keep for debugging if needed later
           throw new Error(
-            `Untersuchungsgebiet übersteigt Test-Server-Limits. (Bitte kleiner wählen)`,
+            "Untersuchungsgebiet übersteigt Test-Server-Limits. (Bitte kleiner wählen)",
           );
         }
 
@@ -129,6 +130,13 @@ export default function CityScope() {
     [analysisLevel, normalizedCategories, addedUserPois, removedPoiIds],
   );
 
+  /**
+   * Computes population-weighted mean travel times per district and category.
+   *
+   * Input: grid-cell features with `pop`, `district_id`, and travel-time fields
+   *        named `tt_<category>`.
+   * Output: mapping `district_id -> { totalPop, means: { [cat]: meanTime } }`.
+   */
   function computeDistrictCategoryMeans(featureCollection, catsLowercase) {
     if (!featureCollection || !Array.isArray(featureCollection.features))
       return null;
@@ -192,6 +200,13 @@ export default function CityScope() {
     return result;
   }
 
+  /**
+   * Computes CityScope headline metrics on grid level:
+   * - coverage: population share that reaches all categories within the threshold
+   * - medianTime: population-weighted median of the "worst" (max) category time
+   *
+   * The per-cell "worst time" is the maximum `tt_<category>` across selected categories.
+   */
   function computeCityScopeStats(
     featureCollection,
     catsLowercase,
@@ -206,6 +221,7 @@ export default function CityScope() {
     let totalPop = 0;
     let coveredPop = 0;
 
+    // For a population-weighted median, store per-cell population and its max travel time
     const timePop = [];
 
     for (const f of featureCollection.features) {
@@ -222,6 +238,7 @@ export default function CityScope() {
       for (const key of ttKeys) {
         const t = props[key];
 
+        // If any category time is missing, treat the cell as not covered
         if (t == null || !Number.isFinite(t)) {
           allCovered = false;
           maxTime = 0;
@@ -240,6 +257,7 @@ export default function CityScope() {
 
     const coverage = coveredPop / totalPop;
 
+    // Population-weighted median of max travel times
     timePop.sort((a, b) => a.time - b.time);
 
     const halfPop = totalPop / 2;
@@ -257,6 +275,9 @@ export default function CityScope() {
     return { coverage, medianTime, totalPop, coveredPop };
   }
 
+  /**
+   * Recompute derived statistics whenever the layer or the analysis parameters change.
+   */
   useEffect(() => {
     if (!cityScopeLayer) return;
 
@@ -277,7 +298,9 @@ export default function CityScope() {
     }
   }, [cityScopeLayer, analysisLevel, normalizedCategories, currentMinutes]);
 
-  /* POI removal (Wegfall-Szenario) */
+  /**
+   * Toggles a POI id in the "removed POIs" set (removal scenario).
+   */
   const toggleRemovedPoi = useCallback((poiId) => {
     setRemovedPoiIds((prev) => {
       const next = new Set(prev);
@@ -287,11 +310,17 @@ export default function CityScope() {
     });
   }, []);
 
+  /**
+   * Clears the removal selection.
+   */
   const clearRemovedPois = useCallback(() => setRemovedPoiIds(new Set()), []);
 
+  /**
+   * Fetches all POIs within the current analysis bbox for the selected categories.
+   * Used to enable POI selection in removal scenario.
+   */
   useEffect(() => {
     if (!bbox) {
-      console.log("RESET");
       setAllPois([]);
       return;
     }
@@ -317,6 +346,9 @@ export default function CityScope() {
       });
   }, [bbox, normalizedCategories]);
 
+  /**
+   * Adds a user-defined POI on map click (add scenario only).
+   */
   const handleMapClick = useCallback(
     (lat, lon) => {
       if (!scenarioMode) return;
@@ -337,6 +369,10 @@ export default function CityScope() {
     [scenarioMode, scenarioAction, scenarioCategory],
   );
 
+  /**
+   * Parses the bbox string from the map (west,south,east,north) and converts it
+   * to the backend format (south,west,north,east).
+   */
   const handleBboxChange = useCallback(
     (bboxString) => {
       currentBboxRef.current = bboxString;
@@ -347,10 +383,8 @@ export default function CityScope() {
         return;
       }
 
-      // Map liefert: west,south,east,north
       const [west, south, east, north] = arr;
 
-      // Backend erwartet: south,west,north,east
       const backendBbox = [south, west, north, east];
 
       setBbox(backendBbox);
@@ -371,6 +405,7 @@ export default function CityScope() {
         }
         onClose={() => setShowScenarioTip(false)}
       />
+
       {!scenarioMode && (
         <div className="sidebars">
           <Sidebar
@@ -390,10 +425,10 @@ export default function CityScope() {
           />
         </div>
       )}
+
       <div className="cityscope-map-wrap">
         {error && <div className="cityscope-error">{error}</div>}
 
-        {/* Toggle button only shown when scenario panel is closed */}
         {!scenarioMode && (
           <div className="cityscope-scenario-toggle">
             <button
@@ -409,7 +444,6 @@ export default function CityScope() {
           </div>
         )}
 
-        {/* Scenario panel */}
         {scenarioMode && (
           <div className="cityscope-scenario-panel leaflet-right">
             <div className="scenario-panel-header">
@@ -426,7 +460,6 @@ export default function CityScope() {
               </button>
             </div>
 
-            {/* NEW: choose add vs remove */}
             <div
               style={{
                 display: "flex",
@@ -444,7 +477,9 @@ export default function CityScope() {
               <button
                 type="button"
                 onClick={() => setScenarioAction("remove")}
-                className={`ui-btn ${scenarioAction === "remove" ? "active" : ""}`}
+                className={`ui-btn ${
+                  scenarioAction === "remove" ? "active" : ""
+                }`}
                 title={
                   !rectanglePlaced
                     ? "Bitte zuerst einen Analysebereich auswählen"
@@ -522,7 +557,7 @@ export default function CityScope() {
         )}
 
         <Tooltip
-          text="Wählen Sie einen Analysebereich aus"
+          text="Wählen Sie oben links Ihren Analysebereich aus"
           open={!rectanglePlaced && !scenarioMode}
         />
 

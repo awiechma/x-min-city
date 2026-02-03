@@ -29,7 +29,10 @@ export default function ReachMap() {
   const [loadingIso, setLoadingIso] = useState(false);
   const [categories, setCategories] = useState(CATEGORIES);
 
-  // Build per-category Leaflet div-icons once.
+  /**
+   * Builds per-category Leaflet div-icons once.
+   * These icons are reused when rendering POI markers.
+   */
   const icons = useMemo(() => {
     function circleIcon(cls) {
       return L.divIcon({
@@ -45,6 +48,12 @@ export default function ReachMap() {
     );
   }, []);
 
+  /**
+   * Initializes the Leaflet map once:
+   * - OSM base layer
+   * - marker layer group for POIs
+   * - click handler to set the origin marker
+   */
   useEffect(() => {
     const map = L.map(mapRef.current, { zoomControl: false }).setView(
       DEFAULT_VIEW.center,
@@ -59,7 +68,6 @@ export default function ReachMap() {
 
     poiLayerRef.current = L.layerGroup().addTo(map);
 
-    // Click handler: set origin and update marker.
     map.on("click", (e) => {
       const nextOrigin = { lat: e.latlng.lat, lng: e.latlng.lng };
       setOrigin(nextOrigin);
@@ -91,6 +99,10 @@ export default function ReachMap() {
     };
   }, []);
 
+  /**
+   * Renders POIs as markers into the dedicated POI layer group.
+   * Expects POIs to have { lat, lon, category, name }.
+   */
   const displayPois = useCallback(
     (pois) => {
       const map = mapInstanceRef.current;
@@ -117,6 +129,10 @@ export default function ReachMap() {
     [icons],
   );
 
+  /**
+   * Displays the isochrone geometry on the map and fits the view to its bounds.
+   * Accepts either a Feature or a Geometry object.
+   */
   const displayGeoJSON = useCallback((geoJSON) => {
     const map = mapInstanceRef.current;
     if (!map || !geoJSON) return;
@@ -143,6 +159,10 @@ export default function ReachMap() {
     map.fitBounds(isoLayerRef.current.getBounds(), { padding: [20, 20] });
   }, []);
 
+  /**
+   * Requests an isochrone polygon from the backend for a given origin, mode, and threshold.
+   * Returns GeoJSON (Feature/Geometry) or null on error.
+   */
   const getIsochrones = useCallback(async (location, mode, time) => {
     try {
       const res = await fetch("/api/isochrone", {
@@ -168,10 +188,14 @@ export default function ReachMap() {
     }
   }, []);
 
+  /**
+   * Fetches POIs for a given isochrone by:
+   * 1) requesting POIs within the isochrone bounding box (backend prefilter)
+   * 2) filtering those POIs to points strictly inside the isochrone polygon (turf)
+   */
   const fetchPois = useCallback(async (isoFeature, cats) => {
     if (!isoFeature) return [];
 
-    // Build bounding box for the Overpass/Backend prefilter request.
     const bounds = L.geoJSON(isoFeature).getBounds();
     const bbox = [
       bounds.getSouth(),
@@ -205,6 +229,13 @@ export default function ReachMap() {
     );
   }, []);
 
+  /**
+   * Main entry point from the Sidebar:
+   * - requests an isochrone
+   * - renders it
+   * - fetches POIs within that isochrone
+   * - updates the visible POI set (category filtering is applied separately)
+   */
   const handleStart = useCallback(
     async (mode, minutes) => {
       if (!origin) return;
@@ -212,18 +243,15 @@ export default function ReachMap() {
       setLoadingIso(true);
 
       try {
-        console.log(
-          `Origin ${origin.lat}, ${origin.lng}, mode ${mode}, minutes ${minutes}`,
-        );
-
         const iso = await getIsochrones(origin, mode, minutes);
         if (iso) displayGeoJSON(iso);
 
-        // Fetch + filter POIs after the isochrone is known
+        // Fetch POIs after the isochrone is known
         const pois = await fetchPois(iso, CATEGORIES);
         setVisiblePois(pois || []);
       } catch (e) {
         console.error(e);
+
         if (poiLayerRef.current) poiLayerRef.current.clearLayers();
         if (isoLayerRef.current && mapInstanceRef.current) {
           mapInstanceRef.current.removeLayer(isoLayerRef.current);
@@ -236,11 +264,13 @@ export default function ReachMap() {
     [origin, categories, getIsochrones, fetchPois, displayGeoJSON, displayPois],
   );
 
+  /**
+   * Applies the active category filter to the fetched POIs and re-renders markers.
+   */
   useEffect(() => {
     if (!poiLayerRef.current) return;
 
     const active = new Set(categories);
-
     const filtered = visiblePois.filter((p) => active.has(p.category));
 
     displayPois(filtered);

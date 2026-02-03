@@ -2,10 +2,29 @@ import datetime
 import shapely
 from r5py import Isochrones, TransportMode, TravelTimeMatrix
 
-import shapely
-from r5py import Isochrones, TransportMode
 
-def calculate_isochrones(network, lat: float, lon: float, mode: str, threshold: int, speed_kmh: float):
+def calculate_isochrones(
+    network,
+    lat: float,
+    lon: float,
+    mode: str,
+    threshold: int,
+    speed_kmh: float,
+):
+    """
+    Calculates a single isochrone polygon for the given origin and time threshold.
+
+    Notes:
+    - R5 is configured with WALK transport mode for both "walk" and "bike".
+      For cycling, speed is approximated by adjusting `speed_walking` because
+      TransportMode.BICYCLE produced inconsistent results in this project setup.
+    - The returned geometry is converted to a convex hull to ensure a valid, simple polygon.
+
+    Returns:
+        GeoJSON Feature with:
+        - properties.travel_time (minutes)
+        - geometry (Polygon)
+    """
     center = shapely.Point(lon, lat)
     mode_l = mode.lower()
 
@@ -13,7 +32,8 @@ def calculate_isochrones(network, lat: float, lon: float, mode: str, threshold: 
         t_modes = [TransportMode.WALK]
         speed_kwargs = {"speed_walking": speed_kmh}
     else:
-        t_modes = [TransportMode.WALK] # Ebenfalls walk da Cycling nicht konsistente Ergebnisse liefert
+        # Cycling is approximated via walking mode + adjusted speed
+        t_modes = [TransportMode.WALK]
         speed_kwargs = {"speed_walking": speed_kmh}
 
     iso = Isochrones(
@@ -35,6 +55,15 @@ def calculate_isochrones(network, lat: float, lon: float, mode: str, threshold: 
 
 
 def build_travel_time_matrix(network, origins_gdf, destinations_gdf, mode: str):
+    """
+    Builds an R5 TravelTimeMatrix between origin points and destination points.
+
+    - For walking: uses TransportMode.WALK
+    - For cycling: uses TransportMode.BICYCLE (if supported and stable in the environment)
+
+    Returns:
+        TravelTimeMatrix (r5py)
+    """
     t_modes = [TransportMode.WALK] if mode.lower() == "walk" else [TransportMode.BICYCLE]
     return TravelTimeMatrix(
         network,
