@@ -66,6 +66,7 @@ Diese sind **nicht im Repository enthalten** und müssen vor dem Start manuell b
 
 2. Kopiere den kompletten Ordner in das Backend-Verzeichnis, sodass folgende Struktur entsteht:
 
+```
 backend/
 ├── app.py
 ├── core/
@@ -79,6 +80,8 @@ backend/
 │ ├── districts.dbf
 │ ├── districts.shx
 │ └── ...
+```
+
 
 #### Backend Setup & Start
 
