@@ -10,6 +10,20 @@ router = APIRouter(prefix="/api", tags=["pois"])
 
 @router.post("/pois")
 async def api_pois(req: PoisRequest, request: Request):
+    """
+    Returns cached POIs within a given bbox for the requested categories.
+
+    Input:
+    - bbox: [south, west, north, east] in WGS84
+    - categories: list of category keys (must exist in CATS)
+
+    Output:
+    - {"pois": [{id, lat, lon, category, name}, ...]}
+
+    Notes:
+    - This endpoint reads from the in-memory POI cache (warmup on startup).
+    - Coordinate validation is applied to guard against malformed Overpass/cache rows.
+    """
     if len(req.bbox) != 4:
         raise HTTPException(status_code=400, detail="bbox must be [south,west,north,east]")
 
@@ -26,11 +40,12 @@ async def api_pois(req: PoisRequest, request: Request):
         if df_cat is None or df_cat.empty:
             continue
 
+        # Fast bbox filter in WGS84 (lat/lon)
         mask = (
-            (df_cat["lat"] >= s) &
-            (df_cat["lat"] <= n) &
-            (df_cat["lon"] >= w) &
-            (df_cat["lon"] <= e)
+            (df_cat["lat"] >= s)
+            & (df_cat["lat"] <= n)
+            & (df_cat["lon"] >= w)
+            & (df_cat["lon"] <= e)
         )
         sub = df_cat.loc[mask]
 
@@ -38,16 +53,13 @@ async def api_pois(req: PoisRequest, request: Request):
             lat = row.get("lat")
             lon = row.get("lon")
 
-            ok = True
+            # Defensive parsing: Overpass-derived data may include non-numeric coordinates
             try:
                 lat_f = float(lat)
                 lon_f = float(lon)
                 if not (math.isfinite(lat_f) and math.isfinite(lon_f)):
-                    ok = False
+                    raise ValueError("Non-finite coordinates")
             except Exception:
-                ok = False
-
-            if not ok:
                 print("\n[POIS INVALID ROW]")
                 print(f"requested_category={cat}")
                 print(f"id={row.get('id')}")
@@ -60,12 +72,14 @@ async def api_pois(req: PoisRequest, request: Request):
             if pd.isna(name):
                 name = None
 
-            pois.append({
-                "id": row["id"],
-                "lat": lat_f,
-                "lon": lon_f,
-                "category": row["category"],
-                "name": name,
-            })
+            pois.append(
+                {
+                    "id": row["id"],
+                    "lat": lat_f,
+                    "lon": lon_f,
+                    "category": row["category"],
+                    "name": name,
+                }
+            )
 
     return {"pois": pois}

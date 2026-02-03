@@ -15,9 +15,22 @@ CYCLE_SPEED = 15
 CELL_SIZE = 100.0
 HALF = CELL_SIZE / 2.0
 
+# Category definitions used for POI retrieval via Overpass.
+# Keys must match the frontend category identifiers (lowercase).
+# Values define OSM tag filters used to build Overpass queries.
 CATS = {
     "education": {"amenity": ["school", "kindergarten", "college", "university"]},
-    "restaurant": {"amenity": ["bar", "biergarten", "cafe", "fast_food", "food_court", "pub", "restaurant"]},
+    "restaurant": {
+        "amenity": [
+            "bar",
+            "biergarten",
+            "cafe",
+            "fast_food",
+            "food_court",
+            "pub",
+            "restaurant",
+        ]
+    },
     "supermarket": {"shop": ["supermarket", "convenience", "food", "mall"]},
     "healthcare": {"amenity": ["clinic", "dentist", "doctors", "hospital", "pharmacy"]},
     "park": {"leisure": ["dog_park", "garden", "nature_reserve", "park", "playground", "cemetery" ]},

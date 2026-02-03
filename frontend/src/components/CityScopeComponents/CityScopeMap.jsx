@@ -36,14 +36,26 @@ export default function CityScopeMap({
 
   const [districtGeo, setDistrictGeo] = useState(null);
 
+  /**
+   * Converts Leaflet bounds to a bbox string in map order:
+   * west,south,east,north
+   */
   const bboxStringFromBounds = (b) =>
     [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].join(",");
 
+  /**
+   * Emits the current bbox (west,south,east,north) via onBboxChange.
+   * The parent converts it to backend order if needed.
+   */
   const emitBboxFromBounds = (bounds) => {
     if (!onBboxChange || !bounds) return;
     onBboxChange(bboxStringFromBounds(bounds));
   };
 
+  /**
+   * Returns the maximum travel time across the currently selected categories
+   * for a single grid cell feature (based on properties `tt_<category>`).
+   */
   const getMaxTravelTimeForSelected = (props) => {
     if (!props || !selectedCategories || selectedCategories.length === 0) {
       return null;
@@ -60,6 +72,10 @@ export default function CityScopeMap({
     return max;
   };
 
+  /**
+   * Color ramp for travel time buckets (minutes).
+   * Used for both grid cells and district polygons.
+   */
   const colorForMinutes = (m) => {
     if (m == null) return "#eeeeee";
     if (m <= 5) return "#1a9641";
@@ -69,6 +85,12 @@ export default function CityScopeMap({
     return "#d7191c";
   };
 
+  /**
+   * Returns a single district metric representing "worst category" travel time:
+   * max(mean travel time across selected categories).
+   *
+   * This mirrors the grid logic (max across categories) to keep both modes comparable.
+   */
   const getDistrictMetric = (districtId) => {
     if (!districtStats) return null;
     const d = districtStats[String(districtId)];
@@ -83,6 +105,10 @@ export default function CityScopeMap({
     return Math.round(Math.max(...values));
   };
 
+  /**
+   * Leaflet style callback for district polygons.
+   * Districts are considered "unreachable" if the metric is missing or exceeds the threshold.
+   */
   const districtStyle = (feature) => {
     const props = feature?.properties || {};
     const id = props.district_id ?? props.id;
@@ -111,6 +137,10 @@ export default function CityScopeMap({
     };
   };
 
+  /**
+   * Builds HTML tooltip content for a district polygon.
+   * Displays population (if present) and per-category mean travel times.
+   */
   const buildDistrictTooltipHtml = (props) => {
     const rawId = props?.district_id ?? props?.id;
     const name = props?.name ?? "–";
@@ -140,6 +170,9 @@ export default function CityScopeMap({
     return lines.join("<br/>");
   };
 
+  /**
+   * Loads district polygons once (used for "district" analysis level).
+   */
   useEffect(() => {
     fetch("/api/districts")
       .then((r) => r.json())
@@ -149,7 +182,12 @@ export default function CityScopeMap({
       );
   }, []);
 
-  // Karte initialisieren + Rectangle ROI Tool
+  /**
+   * Initializes the Leaflet map once, including:
+   * - OSM base layer
+   * - ROI rectangle drawing tool (Leaflet.Draw)
+   * - legend control
+   */
   useEffect(() => {
     if (mapRef.current || !mapElRef.current) return;
 
@@ -166,7 +204,7 @@ export default function CityScopeMap({
 
     mapRef.current = map;
 
-    // ROI via Leaflet.Draw
+    // ROI via Leaflet.Draw (rectangle only)
     const drawnItems = new L.FeatureGroup();
     drawnItems.addTo(map);
     drawnGroupRef.current = drawnItems;
@@ -199,9 +237,12 @@ export default function CityScopeMap({
     const onCreated = (e) => {
       if (e.layerType !== "rectangle") return;
 
+      // Only one ROI at a time
       drawnItems.clearLayers();
       drawnItems.addLayer(e.layer);
       roiLayerRef.current = e.layer;
+
+      // Reset POI layer when changing the ROI
       if (allPoisLayerRef.current) {
         allPoisLayerRef.current.remove();
         allPoisLayerRef.current = null;
@@ -213,7 +254,7 @@ export default function CityScopeMap({
 
     map.on(L.Draw.Event.CREATED, onCreated);
 
-    // Legende
+    // Legend control
     legendRef.current = L.control({ position: "bottomright" });
     legendRef.current.onAdd = () => {
       const div = L.DomUtil.create("div", "cs-legend");
@@ -267,6 +308,9 @@ export default function CityScopeMap({
     };
   }, []);
 
+  /**
+   * Adds a visual hint to the rectangle draw button until an ROI exists.
+   */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -279,12 +323,12 @@ export default function CityScopeMap({
     } else {
       btn.classList.remove("pulse-rectangle");
     }
-  }, [
-    // abhängig von rectanglePlaced und scenarioMode
-    rectanglePlaced,
-  ]);
+  }, [rectanglePlaced]);
 
-  // Map Click (für Szenario-POIs etc.)
+  /**
+   * Enables map click handling for adding user POIs.
+   * Click is disabled in POI removal mode because markers consume clicks.
+   */
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !onMapClick) return;
@@ -300,7 +344,13 @@ export default function CityScopeMap({
     };
   }, [onMapClick, poiRemovalMode]);
 
-  // GeoJSON (Grid oder District) aktualisieren
+  /**
+   * Updates the main geometry layer:
+   * - district mode: district polygons styled by district metric
+   * - grid mode: grid cells styled by max travel time across categories
+   *
+   * Interactivity is disabled while scenario mode is active to avoid conflicting UI.
+   */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -310,7 +360,7 @@ export default function CityScopeMap({
       layerRef.current = null;
     }
 
-    // District-Modus: nur Stadtteil-Polygone
+    // District mode: show only polygons that exist in districtStats
     if (analysisLevel === "district") {
       if (!districtGeo) return;
 
@@ -344,7 +394,7 @@ export default function CityScopeMap({
       return;
     }
 
-    // Grid-Modus: 100x100m-Zellen
+    // Grid mode: render 100x100m cells from backend results
     if (!results?.features?.length) return;
 
     const geoJsonLayer = L.geoJSON(results, {
@@ -401,7 +451,9 @@ export default function CityScopeMap({
     scenarioMode,
   ]);
 
-  // imaginäre POIs anzeigen
+  /**
+   * Renders user-defined (scenario) POIs as small dot markers.
+   */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -430,18 +482,19 @@ export default function CityScopeMap({
     userPoisLayerRef.current = group;
   }, [userPois]);
 
-  // Alle POIs anzeigen + im Wegfall-Modus per Klick "löschen"
+  /**
+   * Renders all POIs inside the ROI when POI removal mode is active.
+   * Clicking a POI marker toggles it in the removed set.
+   */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    // alten Layer entfernen
     if (allPoisLayerRef.current) {
       allPoisLayerRef.current.remove();
       allPoisLayerRef.current = null;
     }
-    console.log(allPois);
-    // nur anzeigen, wenn Wegfall-Modus aktiv ist (oder wenn du einen extra "showAllPois" boolean willst)
+
     if (!poiRemovalMode) return;
     if (!allPois || allPois.length === 0) return;
 
@@ -452,7 +505,6 @@ export default function CityScopeMap({
 
     const group = L.layerGroup(
       allPois
-        // optional: entfernte POIs gar nicht mehr anzeigen
         .filter((p) => !removedSet.has(String(p.id)))
         .map((p) => {
           const id = String(p.id);

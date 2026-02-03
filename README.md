@@ -1,6 +1,5 @@
 # 🏙️ x-Minute-City Remscheid
 
-[![Status](https://img.shields.io/badge/status-active-brightgreen)](#)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#license)
 [![Python](https://img.shields.io/badge/python-3.11-blue?logo=python)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -12,6 +11,9 @@
 Webbasierte Analyse- und Visualisierungsplattform zur **bevölkerungsbezogenen Erreichbarkeit zentraler Alltagsfunktionen** im Sinne der **x-Minuten-Stadt**, umgesetzt am Beispiel der Stadt **Remscheid**.
 
 Das Projekt entstand im Rahmen einer Bachelorarbeit im Studiengang **Geoinformatik**.
+
+🔗 **Live-Demo:** https://x-min-city.com  
+Die Webanwendung ist unter dieser URL öffentlich erreichbar.
 
 ---
 
@@ -26,22 +28,6 @@ Das Projekt entstand im Rahmen einer Bachelorarbeit im Studiengang **Geoinformat
   - Bevölkerungsabdeckung (%)
   - Mediane Reisezeit (Minuten)
 - ⛰️ Berücksichtigung der Topografie (Routing mit Höhenmodell)
-
----
-
-## 🧠 Methodischer Ansatz
-
-- Routing: R5 / R5Py (netzwerkbasiert, inkl. Topografie)
-- Daten:
-  - OpenStreetMap (Straßennetz & POIs)
-  - Zensus 2022 (100 m Raster)
-  - Stadtteilgrenzen Remscheid
-
-- Analyseebenen:
-  - Zensuszellen
-  - Aggregation auf Stadtteilebene
-
----
 
 ## 🧱 Systemarchitektur
 
@@ -68,6 +54,33 @@ Routing & Accessibility (R5)
 - Java (für R5)
 
 ### Backend
+
+#### Benötigte Daten
+
+Für den Betrieb des Backends werden vorbereitete **Daten (OSM-PBF, Höhenmodell, Zensusdaten, Stadtteilgrenzen)** benötigt.
+
+Diese sind **nicht im Repository enthalten** und müssen vor dem Start manuell bereitgestellt werden:
+
+1. Lade den `data/`-Ordner von folgender Seite herunter:  
+   https://uni-muenster.sciebo.de/s/AojxcsryCw49gLP
+
+2. Kopiere den kompletten Ordner in das Backend-Verzeichnis, sodass folgende Struktur entsteht:
+
+backend/
+├── app.py
+├── core/
+├── routes/
+├── services/
+├── data/
+│ ├── duesseldorf-regbez-250910.osm.pbf
+│ ├── hoehenmodell.tif
+│ ├── census_100m_with_district.csv
+│ ├── districts.shp
+│ ├── districts.dbf
+│ ├── districts.shx
+│ └── ...
+
+#### Backend Setup & Start
 
 ```bash
 cd backend
@@ -140,24 +153,6 @@ x-minute-city/
 ├── .gitignore
 └── README.md
 ```
-
----
-
-## ⚠️ Einschränkungen
-
-- Kein ÖPNV
-- Keine individuellen Präferenzen oder Kosten
-- Szenario-POIs werden nicht persistent gespeichert
-
----
-
-## 📌 Ausblick
-
-- Erweiterung auf weitere Städte
-- Parallele Analyse mehrerer Zeitbudgets
-- ÖPNV-Integration als separates Modul
-
----
 
 ## 📄 Lizenz
 

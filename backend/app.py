@@ -20,6 +20,17 @@ app.state.app_state = AppState()
 
 @app.on_event("startup")
 async def startup():
+    """
+    Initializes shared application state at server startup.
+
+    This performs one-time loading of heavyweight resources:
+    - R5 transport network (OSM + elevation model)
+    - census grid data (population)
+    - district geometries
+    - initial POI cache per category for the city bounding box
+
+    The POI cache reduces repeated Overpass requests during interactive use.
+    """
     st = app.state.app_state
 
     st.network_status = "not ready"
@@ -36,9 +47,14 @@ async def startup():
         df_cat = await fetch_pois_for_category(cat, CITY_BBOX)
         st.poi_cache[cat] = df_cat
         print(f"  Kategorie '{cat}': {len(df_cat)} POIs gecached.")
+
+        # Rate limiting: avoid triggering Overpass throttling during warmup
         await asyncio.sleep(5)
+
     print("POI-Cache initialisiert.")
 
+
+# API routes
 app.include_router(isochrone_router)
 app.include_router(pois_router)
 app.include_router(grid_router)
