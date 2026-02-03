@@ -1,4 +1,4 @@
-# 🏙️ x-Minute-City Remscheid
+# x-Minute-City Remscheid
 
 [![License](https://img.shields.io/badge/license-MIT-blue)](#license)
 [![Python](https://img.shields.io/badge/python-3.11-blue?logo=python)](https://www.python.org/)
@@ -13,6 +13,7 @@ Webbasierte Analyse- und Visualisierungsplattform zur **bevölkerungsbezogenen E
 Das Projekt entstand im Rahmen einer Bachelorarbeit im Studiengang **Geoinformatik**.
 
 🔗 **Live-Demo:** https://x-min-city.com  
+
 Die Webanwendung ist unter dieser URL öffentlich erreichbar.
 
 ---
@@ -27,7 +28,6 @@ Die Webanwendung ist unter dieser URL öffentlich erreichbar.
 - 📊 Zwei zentrale Indikatoren:
   - Bevölkerungsabdeckung (%)
   - Mediane Reisezeit (Minuten)
-- ⛰️ Berücksichtigung der Topografie (Routing mit Höhenmodell)
 
 ## 🧱 Systemarchitektur
 
