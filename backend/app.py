@@ -3,7 +3,7 @@ import asyncio
 from r5py import TransportNetwork
 
 from core.state import AppState
-from core.config import OSM_PBF, heightmodel, CITY_BBOX, CATS
+from core.config import OSM_PBF, heightmodel, CITY_BBOX, CATS, CITY_NAME
 
 from services.overpass import fetch_pois_for_category
 from services.zensus import load_grid_df
@@ -34,7 +34,12 @@ async def startup():
     st = app.state.app_state
 
     st.network_status = "not ready"
-    st.network = TransportNetwork(OSM_PBF, elevation_model=heightmodel)
+    print(f"Lade Netzwerk für {CITY_NAME} ({OSM_PBF})")
+    if heightmodel:
+        st.network = TransportNetwork(OSM_PBF, elevation_model=heightmodel)
+    else:
+        print("Kein Höhenmodell gefunden, Routing ohne Höhendaten")
+        st.network = TransportNetwork(OSM_PBF)
     st.network_status = "ready"
     print("Netzwerk geladen")
 

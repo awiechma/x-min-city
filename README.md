@@ -83,6 +83,23 @@ backend/
 ```
 
 
+### Stadt wählen (Gelsenkirchen / Remscheid)
+
+Die App unterstützt mehrere Städte. Standard ist **Gelsenkirchen**.
+
+- Backend: Umgebungsvariable `XMIN_CITY` (`gelsenkirchen` oder `remscheid`), Profile in `backend/core/config.py`
+- Frontend: `VITE_CITY` in `frontend/.env` (gleicher Wert), Profile in `frontend/src/components/cityConfig.js`
+
+Daten für Gelsenkirchen einmalig erzeugen (lädt OSM-Netz Regierungsbezirk Münster, Zensus 2022 und die Stadtteilgrenzen aus OSM nach `backend/data/gelsenkirchen/`):
+
+```bash
+cd backend
+.venv\Scripts\activate
+python ../scripts/prepare_gelsenkirchen.py
+```
+
+Für Remscheid: `set XMIN_CITY=remscheid` (PowerShell: `$env:XMIN_CITY="remscheid"`) und `VITE_CITY=remscheid`.
+
 #### Backend Setup & Start
 
 ```bash
