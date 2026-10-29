@@ -1,4 +1,5 @@
 import "./css/LandingPage.css";
+import { CITY } from "./cityConfig";
 
 export default function LandingPage() {
   return (
@@ -7,7 +8,7 @@ export default function LandingPage() {
         <div className="lp-hero-inner">
           <div className="lp-hero-text">
             <h1 className="lp-title">
-              Die x-Minuten-Stadt am Beispiel Remscheid
+              Die x-Minuten-Stadt am Beispiel {CITY.name}
             </h1>
             <p className="lp-subtitle">
               Webbasierte, interaktive Analyse der{" "}
@@ -34,7 +35,7 @@ export default function LandingPage() {
                   ausgeführt. Aufgrund der begrenzten Serverressourcen sind
                   aktuell nur kleinere Analysebereiche sinnvoll nutzbar. Sehr
                   große Bounding-Boxen (z. B. das gesamte Stadtgebiet
-                  Remscheids) können zu langen Rechenzeiten oder Abbrüchen
+                  {CITY.genitive}) können zu langen Rechenzeiten oder Abbrüchen
                   führen.
                 </p>
               </div>
@@ -53,7 +54,7 @@ export default function LandingPage() {
             <div className="lp-map-screenshot">
               <img
                 src="/images/cityscope-preview.png"
-                alt="Vorschau der x-Minuten-Stadt Analyse für Remscheid"
+                alt={`Vorschau der x-Minuten-Stadt Analyse für ${CITY.name}`}
               />
             </div>
           </div>
@@ -345,7 +346,7 @@ export default function LandingPage() {
               <div className="lp-method">
                 <div className="lp-method-k">Bevölkerung</div>
                 <div className="lp-method-v">Zensus 2022, 100×100 m Raster</div>
-                <div className="lp-method-v">Stadtteile Remscheid</div>
+                <div className="lp-method-v">Stadtteile {CITY.name}</div>
               </div>
               <div className="lp-method">
                 <div className="lp-method-k">POIs</div>
@@ -395,7 +396,7 @@ export default function LandingPage() {
       <footer className="lp-footer">
         <div className="lp-container lp-footer-inner">
           <div className="lp-footer-left">
-            <div className="lp-footer-title">x-Minuten-Stadt Remscheid</div>
+            <div className="lp-footer-title">x-Minuten-Stadt {CITY.name}</div>
             <div className="lp-footer-sub">
               Bachelorarbeit · Universität Münster · Institut für Geoinformatik
             </div>

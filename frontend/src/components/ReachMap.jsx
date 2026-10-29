@@ -8,11 +8,12 @@ import LoadingOverlay from "./LoadingOverlay";
 import Tooltip from "./Tooltip";
 
 import { CATEGORIES, getLabel, getDotClass } from "./tagConfig";
+import { CITY } from "./cityConfig";
 
 import "./css/ReachMap.css";
 import "./css/POI.css";
 
-const DEFAULT_VIEW = { center: [51.178, 7.192], zoom: 13 };
+const DEFAULT_VIEW = CITY.reachView;
 
 export default function ReachMap() {
   const mapRef = useRef(null);

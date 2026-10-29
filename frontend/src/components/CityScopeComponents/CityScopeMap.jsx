@@ -5,6 +5,7 @@ import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "../css/CityScopeLeaflet.css";
 import { getLabel } from "../tagConfig";
+import { CITY } from "../cityConfig";
 
 export default function CityScopeMap({
   results,
@@ -192,8 +193,8 @@ export default function CityScopeMap({
     if (mapRef.current || !mapElRef.current) return;
 
     const map = L.map(mapElRef.current, {
-      center: [51.18, 7.2],
-      zoom: 12,
+      center: CITY.center,
+      zoom: CITY.zoom,
       zoomControl: false,
     });
 
